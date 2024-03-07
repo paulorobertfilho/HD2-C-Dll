@@ -15,7 +15,6 @@ HANDLE hMainThread;
 void InitializeConsole() {
     FILE* pFile = nullptr;
     AllocConsole();
-    SetConsoleTitle(L"Helldivers 2 DLL Proxy PoC");
     freopen_s(&pFile, "CONOUT$", "w", stdout);
 }
 
@@ -41,14 +40,7 @@ struct Checkbox {
 void displayCheckboxes(const std::vector<Checkbox>& checkboxes, size_t selectedCheckbox) {
     system("cls"); // Clear the console (Windows specific)
 
-    printf("[Init] - Helldiver 2 PoC DLL Proxy...\n");
-    printf("[Init] - Thanks to cfemen and gir489...\n");
-
-    printf("[Ready] : Select some of the features below by pressing the [Space] key.\n");
-    printf("[Ready] : Press [Enter] to run the feature you selected.\n");
-    printf("[Ready] : After pressing [Enter], the selected features cannot be changed.\n");
-
-    std::cout << "Checkboxes:\n";
+    std::cout << "Options:\n";
     for (size_t i = 0; i < checkboxes.size(); ++i) {
         if (i == selectedCheckbox) {
             std::cout << "> ";
@@ -138,7 +130,7 @@ DWORD WINAPI Payload(LPVOID lpParam)
             break;
 
         case 13: // Enter key
-            std::cout << "Activate Cheat Feature.\n";
+            std::cout << "Activate\n";
             break;
 
         case 27: // Esc key
