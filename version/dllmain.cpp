@@ -5,11 +5,11 @@
 #include <stdlib.h>
 #include <cstdio>
 #include <iostream>
-#include "Memory.h"
 #include "GameData.h"
 #include <conio.h> // For _getch() on Windows
+#include "Memory.h"
 
-HANDLE hMainThread;
+HANDLE hMainThread; //
 
 // Function to initialize and show the console window
 void InitializeConsole() {
@@ -61,24 +61,24 @@ DWORD WINAPI Payload(LPVOID lpParam)
 
     //Console Menu
     std::vector<Checkbox> checkboxes = { 
-          {"Inf Health", false}
-        , {"Inf Grenades", false}
+          {"Inf H", false}
+        , {"Inf G", false}
         , {"Inf Grenades(Legit)", false}
-        , {"Inf Ammo", false}
+        , {"Inf A", false}
         , {"Inf Ammo(Legit)", false}
-        , {"Inf Syringes", false}
+        , {"Inf S", false}
         , {"Inf Syringes(Legit)", false}
         , {"Inf Stamina", false}
         , {"Inf Stratagems", false}
-        , {"Inf Mission Time", false}
+        , {"Inf M Time", false}
         //, {"One / Two Hit Kill ( Bile Titan Bug, Aim Only Head )", false}
         , {"No Reload", false}
         , {"Max Resources", false}
         , {"Add 5 Samples", false}
         , {"No Recoil", false}
         , {"Inf Backpack", false}
-        , {"Inf Special Weapon", false}
-        , {"No Laser Cannon Overheat", false}
+        , {"Inf S Weapon", false}
+        , {"No L Cannon Overheat", false}
         , {"Instant Railgun", false}
         , {"Show All Map Icons", false}
         , {"No Stationary Turret Overheat", false}
@@ -94,32 +94,25 @@ DWORD WINAPI Payload(LPVOID lpParam)
     char userInput;
 
     HMODULE moduleHandle = nullptr;
-    GameData gData;
+    GameData gData;//
 
     do
     {
         moduleHandle = GetModuleHandle(L"game.dll");
-        Sleep(1000);
+        Sleep(1100);
     } while (!moduleHandle);
-    Sleep(100);
-
-
-    //Show Console
+    Sleep(120);
+    //Show ConsoleW
     InitializeConsole();
-    
     do {
-
         displayCheckboxes(checkboxes, selectedCheckbox);
-
         // Get user input
         userInput = _getch(); // Use _getch() for reading a single character without pressing Enter
-
         // Handle arrow key input
         switch (userInput) {
         case 72: // Up arrow key
             selectedCheckbox = (selectedCheckbox == 0) ? numCheckboxes - 1 : selectedCheckbox - 1;
             break;
-
         case 80: // Down arrow key
             selectedCheckbox = (selectedCheckbox == numCheckboxes - 1) ? 0 : selectedCheckbox + 1;
             break;
@@ -147,7 +140,6 @@ DWORD WINAPI Payload(LPVOID lpParam)
     for (size_t i = 0; i < checkboxes.size(); ++i) {
         if (checkboxes[i].checked)
         {
-
             if (checkboxes[i].title == "Inf Health")
             {
                 if (!gData.InfHealth) // no need but its old code when activate using hotkey, but need to much hotkey for all feature
@@ -165,7 +157,6 @@ DWORD WINAPI Payload(LPVOID lpParam)
                         0xFF, 0x25, 0x00, 0x00, 0x00, 0x00,  // JMP [rip+6]
                         0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, // Placeholder for the target address
                     };
-
                     BYTE InfHealthByte1[] =
                     {
                         0xB8, 0xE8, 0x03, 0x00, 0x00,
@@ -178,31 +169,28 @@ DWORD WINAPI Payload(LPVOID lpParam)
                         0xFF, 0x25, 0x00, 0x00, 0x00, 0x00,  // JMP [rip+6]
                         0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, // Placeholder for the target address
                     };
-
                     uintptr_t InfHealth = Memory::FindPattern("game.dll", "45 89 38 49 8B 84 DE 28 04 00 00");
                     LPVOID memory = Memory::AllocateMemory(InfHealth, 0x100);
                     Memory::CreateTrampoline(InfHealth, memory);
                     Memory::WriteAssemblyInstructions((uintptr_t)memory, InfHealth + 14, InfHealthByte, Memory::ArrayLength(InfHealthByte));
-
                     uintptr_t InfHealth1 = Memory::FindPattern("game.dll", "41 8B 84 8B 28 4C 00 00 48 8B 5C 24 20 48 8B 74 24 28");
                     memory = Memory::AllocateMemory(InfHealth1, 0x100);
                     Memory::CreateTrampoline(InfHealth1, memory);
                     Memory::WriteAssemblyInstructions((uintptr_t)memory, InfHealth1 + 18, InfHealthByte1, Memory::ArrayLength(InfHealthByte1));
-
                     gData.InfHealth = !gData.InfHealth;
-                    //create trampolin
-                    printf("[Active] Infinite Health\n");
+                    printf("[Active] Infinite h\n");
                 }
             }
 
             if (checkboxes[i].title == "Inf Grenades")
             {
+                printf("[Active]\n");
                 if (!gData.InfGrenades)
                 {
                     uintptr_t GrenadesAddress = Memory::FindPattern("game.dll", "41 FF 08 4A 8B 84 ED");
                     Memory::Nop((LPVOID)(GrenadesAddress), 3);
                     gData.InfGrenades = !gData.InfGrenades;
-                    printf("[Active] Infinite Grenades\n");
+                    printf("[Active] Infinite g\n");
                 }
             }
 
@@ -624,13 +612,11 @@ DWORD WINAPI Payload(LPVOID lpParam)
 
         }
     }
-    printf("[Exit] Unload\n");
+    printf("[Exit]\n");
     FreeConsole();
     FreeLibraryAndExitThread(GetModuleHandle(NULL), 0);
     return 0;
 }
-
-
 BOOL APIENTRY DllMain(HMODULE hModule,
     DWORD  ul_reason_for_call,
     LPVOID lpReserved
